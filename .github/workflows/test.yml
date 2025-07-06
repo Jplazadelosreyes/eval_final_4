@@ -36,7 +36,8 @@ jobs:
       - name: Deploy and Test Webapp Health
         # Levanta la webapp y espera a que su healthcheck pase.
         # Esto simula un despliegue y verifica que el servidor web está operativo.
-        run: docker compose up --abort-on-container-exit --wait webapp
+        # Se eliminó --abort-on-container-exit ya que es incompatible con --wait.
+        run: docker compose up --wait webapp
 
       - name: Stop and Remove Containers
         # Asegura que los contenedores se detengan y eliminen, incluso si algún paso anterior falla.
