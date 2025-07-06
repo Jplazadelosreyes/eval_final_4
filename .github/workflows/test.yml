@@ -24,20 +24,20 @@ jobs:
           cache: 'maven'
 
       - name: Build and Run Unit Tests
-        # Ejecuta el servicio 'unit-tests' definido en docker-compose.yml
-        # Maven ejecutará los tests unitarios y generará los reportes
+        # Ejecuta el servicio 'unit-tests' definido en docker-compose.yml.
+        # El pom.xml ya está configurado para excluir HealthTrackFunctionalTest.java.
         run: docker compose run --rm unit-tests
 
       - name: Build Webapp Image
-        # Construye solo la imagen de la webapp
+        # Construye solo la imagen de la webapp.
         run: docker compose build webapp
 
       - name: Deploy and Test Webapp Health
-        # Levanta la webapp y espera a que su healthcheck pase
-        # Esto simula un despliegue y verifica que el servidor web está operativo
+        # Levanta la webapp y espera a que su healthcheck pase.
+        # Esto simula un despliegue y verifica que el servidor web está operativo.
         run: docker compose up --abort-on-container-exit --wait webapp
 
       - name: Stop and Remove Containers
-        # Asegura que los contenedores se detengan y eliminen, incluso si algún paso anterior falla
+        # Asegura que los contenedores se detengan y eliminen, incluso si algún paso anterior falla.
         if: always()
         run: docker compose down
