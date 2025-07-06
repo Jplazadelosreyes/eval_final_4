@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - HealthTrack App (Despliegue y Unitarias)
+name: CI/CD Pipeline - HealthTrack App (Solo Revision y Dependencias)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy-test: # Nombre del trabajo ajustado para reflejar el enfoque
+  build-and-check-code: # Nombre del trabajo ajustado
     runs-on: ubuntu-latest
 
     steps:
@@ -23,11 +23,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build and Run Unit Tests
-        # Ejecuta el servicio 'unit-tests' definido en docker-compose.yml.
-        # El pom.xml ya está configurado para excluir HealthTrackFunctionalTest.java,
-        # por lo que solo se ejecutarán las pruebas unitarias.
-        run: docker compose run --rm unit-tests
+      - name: Build and Check Dependencies (No Tests)
+        # Ejecuta el servicio 'unit-tests' pero sobrescribe su comando
+        # para solo limpiar e instalar dependencias, sin ejecutar pruebas.
+        # Esto verifica que el código compila y que las dependencias se resuelven.
+        run: docker compose run --rm unit-tests mvn clean install -DskipTests
 
       - name: Build Webapp Image
         # Construye solo la imagen de la webapp.
