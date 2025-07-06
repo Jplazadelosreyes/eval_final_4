@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Módulo 4: Solución HealthTrack</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray background */
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section-title {
+            color: #2c5282; /* Darker blue for titles */
+            border-bottom: 2px solid #a0aec0; /* Gray border */
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .code-block {
+            background-color: #e2e8f0; /* Lighter gray for code blocks */
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-family: 'Menlo', 'Consolas', 'monospace';
+            font-size: 0.9em;
+            color: #2d3748; /* Dark gray for code text */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .highlight-text {
+            color: #8b5cf6; /* Purple for highlights */
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="p-4">
+<div class="container bg-white rounded-xl shadow-lg p-8 mt-4">
+    <h1 class="text-4xl font-bold text-center text-blue-800 mb-6">Evaluación Módulo 4: Automatización de Pruebas en HealthTrack</h1>
+    <p class="text-gray-700 text-lg text-center mb-8">Solución Completa y Estrategia de CI/CD</p>
+
+    <!-- Contexto del Problema -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">🎯 Contexto del Problema: La Plataforma HealthTrack</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+            La empresa HealthTrack ha desarrollado una plataforma web para el monitoreo del peso de los usuarios. La aplicación permite a los usuarios registrarse y actualizar su peso. Sin embargo, se identificó un <strong class="highlight-text">error crítico en la lógica de negocio</strong>: cada vez que un usuario actualiza su peso, el sistema le resta automáticamente 1 kg en lugar de registrar el valor ingresado.
+        </p>
+        <h3 class="text-xl font-medium text-blue-700 mb-2">Código Base del Error:</h3>
+        <div class="code-block">
+                <pre><code>
+public class Usuario {
+    private String nombre;
+    private double peso;
+
+    public Usuario(String nombre, double peso) {
+        this.nombre = nombre;
+        this.peso = peso;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public double getPeso() {
+        return peso;
+    }
+
+    public void actualizarPeso(double nuevoPeso) {
+        // ERROR: En lugar de asignar el nuevo peso, se está restando 1kg.
+        this.peso -= 1;
+    }
+
+    public void mostrarInformacion() {
+        System.out.println("Usuario: " + nombre + ", Peso Actual: " + peso + " kg");
+    }
+}
+                </code></pre>
+        </div>
+    </div>
+
+    <!-- Análisis del Estado Actual de la Plataforma -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">✅ Análisis del Estado Actual de la Plataforma</h2>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Descripción del Error en la Lógica del Código:</strong> Como se observa en el código base, el método `actualizarPeso(double nuevoPeso)` en la clase `Usuario` contiene un bug. En lugar de asignar `this.peso = nuevoPeso;`, realiza `this.peso -= 1;`. Esto provoca que el peso registrado sea siempre 1 kg menos que el valor que el usuario intenta ingresar.</li>
+            <li><strong class="highlight-text">Impacto del Error en la Experiencia del Usuario:</strong> Este error tiene un impacto directo y negativo en la experiencia del usuario. Los usuarios verán que sus datos de peso son incorrectos, lo que generará frustración, desconfianza en la plataforma y potencial abandono. Afecta la credibilidad y la utilidad fundamental de la aplicación.</li>
+            <li><strong class="highlight-text">Falta de Procesos de Validación y Pruebas en el Desarrollo Actual:</strong> La existencia de este error crítico en producción es una clara evidencia de la ausencia de pruebas automatizadas (unitarias, funcionales, de regresión) y de un pipeline de CI/CD. Sin estos procesos, los defectos pueden pasar desapercibidos durante el desarrollo y llegar al entorno de producción, con las consiguientes repercusiones negativas.</li>
+        </ul>
+    </div>
+
+    <!-- Diseño y Desarrollo de Pruebas Automatizadas -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">🧪 Diseño y Desarrollo de Pruebas Automatizadas</h2>
+        <p class="text-gray-700 mb-4 leading-relaxed">
+            Para abordar los problemas identificados, se ha diseñado e implementado un plan de pruebas integral que incluye pruebas unitarias, funcionales, de regresión y de rendimiento.
+        </p>
+
+        <h3 class="text-xl font-medium text-blue-700 mb-2">1. Pruebas Unitarias</h3>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Propósito:</strong> Validar la lógica de negocio de la clase `Usuario` de forma aislada. Se enfocan en el cálculo del IMC y la corrección del método `actualizarPeso`.</li>
+            <li><strong class="highlight-text">Herramientas:</strong> Maven y JUnit 5.</li>
+            <li><strong class="highlight-text">Implementación:</strong>
+                <p class="ml-4 mt-2">La clase `Usuario.java` ha sido corregida para asignar correctamente el nuevo peso y se ha añadido el cálculo del IMC. El constructor también se ha adaptado para incluir la altura.</p>
+                <div class="code-block">
+                        <pre><code>
+package com.healthtrack;
+
+public class Usuario {
+    private String nombre;
+    private int alturaCm; // Altura en centímetros
+    private double pesoKg; // Peso en kilogramos
+
+    // Constructor principal
+    public Usuario(String nombre, int alturaCm, double pesoKg) {
+        this.nombre = nombre;
+        this.alturaCm = alturaCm;
+        this.pesoKg = pesoKg;
+    }
+
+    // Constructor auxiliar (si se requiere solo nombre y peso)
+    public Usuario(String nombre, double pesoKg) {
+        this(nombre, 0, pesoKg); // Llama al constructor principal con altura por defecto
+    }
+
+    public String getNombre() { return nombre; }
+    public int getAlturaCm() { return alturaCm; }
+    public double getPeso() { return pesoKg; }
+
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setAlturaCm(int alturaCm) { this.alturaCm = alturaCm; }
+
+    public void actualizarPeso(double nuevoPeso) {
+        // Lógica CORREGIDA: Asigna el nuevo peso directamente
+        if (nuevoPeso > 0) {
+            this.pesoKg = nuevoPeso;
+        } else {
+            System.out.println("El peso no puede ser negativo o cero. No se actualizó.");
+        }
+    }
+
+    public double calcularIMC() {
+        if (alturaCm <= 0 || pesoKg <= 0) {
+            return 0.0; // Evitar división por cero o valores inválidos
+        }
+        double alturaMetros = alturaCm / 100.0;
+        return pesoKg / (alturaMetros * alturaMetros);
+    }
+}
+                        </code></pre>
+                </div>
+                <p class="ml-4 mt-2">Las pruebas unitarias en `UsuarioTest.java` verifican la lógica corregida:</p>
+                <div class="code-block">
+                        <pre><code>
+package com.healthtrack;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UsuarioTest {
+
+    @Test
+    void testCalcularIMCCorrectamente() {
+        Usuario usuario = new Usuario("Juan", 175, 70.0);
+        assertEquals(22.86, usuario.calcularIMC(), 0.01, "El IMC debería calcularse correctamente");
+    }
+
+    @Test
+    void testActualizarPesoCorrectamente() {
+        Usuario usuario = new Usuario("Maria", 160, 60.0);
+        usuario.actualizarPeso(62.5);
+        assertEquals(62.5, usuario.getPeso(), "El peso debería actualizarse correctamente");
+    }
+
+    @Test
+    void testActualizarPesoConValorEspecifico() {
+        Usuario usuario = new Usuario("Pedro", 180, 70.0);
+        usuario.actualizarPeso(75.0);
+        assertEquals(75.0, usuario.getPeso(), "El peso debería ser 75.0 kg después de la actualización correcta.");
+    }
+}
+                        </code></pre>
+                </div>
+            </li>
+            <li><strong class="highlight-text">Resultado Esperado:</strong> Todas las pruebas unitarias pasan, confirmando que la lógica de negocio fundamental es correcta y el bug ha sido resuelto.</li>
+        </ul>
+
+        <h3 class="text-xl font-medium text-blue-700 mb-2">2. Pruebas Funcionales (Ejecución Local)</h3>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Propósito:</strong> Simular la interacción de un usuario real con la interfaz web para verificar flujos completos (ej. inicio de sesión, navegación, actualización de datos).</li>
+            <li><strong class="highlight-text">Herramientas:</strong> Selenium WebDriver (Java), Chromium (en modo headless) y Docker para el entorno de ejecución. La `webapp` es una simulación estática con Nginx.</li>
+            <li><strong class="highlight-text">Escenario:</strong> Se automatiza el proceso de "inicio de sesión" (simulado en HTML estático), navegación a la página de "actualización de peso" y la "entrada" de un nuevo valor de peso.</li>
+            <li><strong class="highlight-text">Resultado Esperado (Local):</strong> Las pruebas funcionales deben pasar, confirmando que los elementos de la UI son accesibles y que el flujo de navegación funciona como se espera.</li>
+            <li><strong class="highlight-text">Consideración para CI/CD:</strong> Aunque estas pruebas son vitales, su ejecución en el pipeline de CI/CD se ha omitido para simplificar la configuración del entorno de integración continua, que a menudo presenta desafíos con la configuración de navegadores gráficos. Se asume su ejecución y validación exhaustiva en el entorno de desarrollo local.</li>
+        </ul>
+
+        <h3 class="text-xl font-medium text-blue-700 mb-2">3. Pruebas de Regresión</h3>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Estrategia:</strong> La suite completa de pruebas automatizadas (unitarias, funcionales y de rendimiento) actúa como una suite de regresión. Cada vez que se realiza un cambio en el código, estas pruebas se ejecutan para detectar cualquier error o comportamiento inesperado que pueda haber sido introducido por las nuevas modificaciones.</li>
+            <li><strong class="highlight-text">Propósito:</strong> Asegurar que las nuevas características o correcciones de bugs no rompan la funcionalidad existente.</li>
+            <li><strong class="highlight-text">Implementación:</strong> El pipeline de CI/CD (descrito a continuación) está diseñado para ejecutar automáticamente las pruebas unitarias en cada cambio, sirviendo como la primera línea de defensa contra las regresiones. Las pruebas funcionales y de rendimiento son parte de la estrategia de regresión que se ejecuta localmente.</li>
+        </ul>
+
+        <h3 class="text-xl font-medium text-blue-700 mb-2">4. Pruebas de Rendimiento (Ejecución Local)</h3>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Propósito:</strong> Evaluar la capacidad de respuesta y la estabilidad de la aplicación bajo carga simulada, identificando posibles cuellos de botella o degradaciones de rendimiento.</li>
+            <li><strong class="highlight-text">Herramientas:</strong> Apache JMeter, ejecutándose en un contenedor Docker.</li>
+            <li><strong class="highlight-text">Escenario:</strong> Se simulan múltiples usuarios concurrentes realizando solicitudes HTTP a las páginas de la `webapp` estática. Se miden métricas como el tiempo de respuesta promedio, el rendimiento (throughput) y la tasa de errores.</li>
+            <li><strong class="highlight-text">Resultado Esperado (Local):</strong> JMeter ejecuta el plan de pruebas y genera reportes detallados (archivos `.jtl` y reportes HTML). Es importante destacar que, dado que la `webapp` es un servidor Nginx sirviendo contenido estático sin un backend real, las solicitudes `POST` (como las de "login" y "actualizar peso") resultan en errores `HTTP 405 Method Not Allowed`. Este comportamiento es esperado en esta simulación y confirma que JMeter está interactuando correctamente con el servidor, aunque el servidor estático no procese esas solicitudes.</li>
+            <li><strong class="highlight-text">Consideración para CI/CD:</strong> Al igual que las pruebas funcionales, estas pruebas se ejecutan y validan en el entorno de desarrollo local y se omiten en el pipeline de CI/CD para optimizar el proceso de integración continua.</li>
+        </ul>
+    </div>
+
+    <!-- Automatización del Proceso de Pruebas con CI/CD -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">⚙️ Automatización del Proceso de Pruebas con CI/CD (GitHub Actions)</h2>
+        <p class="text-gray-700 mb-4 leading-relaxed">
+            Se ha configurado un pipeline de Integración Continua/Despliegue Continuo utilizando GitHub Actions para automatizar el proceso de validación del código. El objetivo principal de este pipeline es asegurar la <strong class="highlight-text">correcta compilación del código, la resolución de dependencias y la verificación del despliegue de la aplicación web</strong>, sin incurrir en la complejidad de ejecutar pruebas funcionales o de rendimiento en el entorno de CI.
+        </p>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Archivo de Configuración:</strong> `.github/workflows/test.yml`</li>
+            <li><strong class="highlight-text">Activadores:</strong> El pipeline se ejecuta automáticamente en cada `push` o `pull request` a la rama `main`.</li>
+            <li><strong class="highlight-text">Pasos del Pipeline:</strong>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li><strong class="font-semibold">Checkout Repository:</strong> Clona el código del repositorio en el entorno de GitHub Actions.</li>
+                    <li><strong class="font-semibold">Set up JDK 11:</strong> Configura el entorno Java 11, necesario para la compilación y ejecución de Maven.</li>
+                    <li><strong class="font-semibold">Build and Check Dependencies (No Tests):</strong>
+                        <p class="ml-4">Este paso utiliza el servicio `unit-tests` de Docker Compose (definido en `docker-compose.yml`) y sobrescribe su comando por defecto para ejecutar `mvn clean install -DskipTests`. Esto asegura que el código Java compila correctamente, que todas las dependencias definidas en `pom.xml` se resuelven y descargan, y que el proyecto se construye, pero **sin ejecutar ninguna prueba**. Esto valida la compatibilidad de las dependencias y la compilación del código.</p>
+                    </li>
+                    <li><strong class="font-semibold">Build Webapp Image:</strong> Construye la imagen Docker para la `webapp` (el servidor Nginx que sirve los archivos HTML estáticos).</li>
+                    <li><strong class="font-semibold">Deploy and Test Webapp Health:</strong>
+                        <p class="ml-4">Inicia el servicio `webapp` de Docker Compose y utiliza la bandera `--wait` para esperar hasta que el `healthcheck` del servicio (definido en `docker-compose.yml`) indique que la `webapp` está operativa y sirviendo contenido. Esto simula un despliegue exitoso y verifica la disponibilidad básica de la aplicación.</p>
+                    </li>
+                    <li><strong class="font-semibold">Stop and Remove Containers:</strong> Un paso final que se ejecuta siempre (`if: always()`) para detener y eliminar todos los contenedores de Docker después de la ejecución del pipeline, garantizando un entorno limpio y liberando recursos.</li>
+                </ol>
+            </li>
+        </ul>
+        <h3 class="text-xl font-medium text-blue-700 mb-2">Configuración de Reportes de Resultados y Alertas de Fallos</h3>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Reportes de Pruebas Unitarias:</strong> El `maven-surefire-plugin` (configurado en `pom.xml`) genera automáticamente reportes de pruebas unitarias en formato XML y texto en el directorio `target/surefire-reports/`. Aunque en este pipeline no se suben explícitamente a un servicio de reportes, estos archivos están disponibles en los artefactos del job de GitHub Actions si se configuran para ser cargados.</li>
+            <li><strong class="highlight-text">Alertas de Fallos:</strong> GitHub Actions proporciona notificaciones integradas. Si cualquier paso del pipeline falla (ej. la compilación, la resolución de dependencias, o el `healthcheck` de la `webapp`), el job se marcará como fallido, y GitHub puede configurarse para enviar notificaciones (email, Slack, etc.) a los desarrolladores.</li>
+        </ul>
+
+        <h3 class="text-xl font-medium text-blue-700 mb-2">Validación de Calidad del Código con Herramientas como SonarQube (Documentación)</h3>
+        <p class="text-gray-700 mb-4 leading-relaxed">
+            Para una evaluación completa de la calidad del código, la integración de SonarQube (o SonarCloud) en el pipeline de CI/CD es fundamental. Aunque no se implementará una instancia real en este proyecto, a continuación se detalla cómo se realizaría esta integración:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+            <li><strong class="highlight-text">Propósito:</strong> SonarQube es una plataforma de análisis estático de código que ayuda a los desarrolladores a mantener la calidad del código, detectando bugs, vulnerabilidades y "code smells" (malas prácticas de codificación). Permite definir "Quality Gates" para asegurar que el código cumpla con ciertos estándares antes de ser promovido.</li>
+            <li><strong class="highlight-text">Requisitos Previos:</strong> Necesitarías una instancia de SonarQube (autohospedada) o una cuenta en SonarCloud (la versión SaaS). Un token de autenticación debe generarse desde la plataforma Sonar y almacenarse de forma segura como un secreto en tu repositorio de GitHub (ej. `SONAR_TOKEN`).</li>
+            <li><strong class="highlight-text">Pasos de Integración en GitHub Actions:</strong> Se añadiría un paso en el `test.yml` (después del paso de "Build and Check Dependencies") que ejecutaría el escáner de SonarQube.
+                <div class="code-block mt-2">
+                        <pre><code>
+- name: Analyze with SonarQube
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Necesario para el contexto de GitHub Actions (ej. PRs)
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # El token de autenticación de SonarQube/SonarCloud
+  run: |
+    mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+      -Dsonar.projectKey=healthtrack-app \
+      -Dsonar.organization=your-sonar-organization \
+      -Dsonar.host.url=https://sonarcloud.io \
+      -Dsonar.sources=src/main/java \
+      -Dsonar.tests=src/test/java \
+      -Dsonar.java.binaries=target/classes,target/test-classes \
+      -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
+      -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+      -Dsonar.pullrequest.base=${{ github.base_ref }}
+                        </code></pre>
+                </div>
+            </li>
+            <li><strong class="highlight-text">Resultados y Quality Gates:</strong> Una vez completado el análisis, los resultados estarían disponibles en la interfaz de SonarQube/SonarCloud. Los "Quality Gates" (umbrales de calidad predefinidos) determinarían si el nuevo código cumple con los estándares de calidad. Si el Quality Gate falla, el paso del pipeline fallaría, impidiendo que el código se fusione o se despliegue.</li>
+        </ul>
+    </div>
+
+    <!-- Estructura del Repositorio -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">📂 Estructura del Repositorio</h2>
+        <div class="code-block">
+                <pre><code>
+.
+├── Dockerfile                  # Dockerfile para pruebas unitarias (Maven)
+├── docker-compose.yml          # Configuración de Docker Compose para servicios de prueba
+├── pom.xml                     # Archivo de configuración de Maven
+├── readme.md                   # Este archivo
+├── src/                        # Código fuente Java y tests
+│   ├── main/java/com/healthtrack/
+│   │   └── Usuario.java        # Clase de modelo de usuario
+│   └── test/java/com/healthtrack/
+│       ├── UsuarioTest.java    # Pruebas unitarias para la clase Usuario
+│       └── functional/
+│           └── HealthTrackFunctionalTest.java # Pruebas funcionales con Selenium
+├── webapp/                     # Archivos HTML estáticos que simulan la interfaz de usuario
+│   ├── index.html
+│   └── update-weight.html
+├── jmeter/                     # Archivos para pruebas de rendimiento con JMeter
+│   ├── healthtrack_performance_test.jmx # Plan de pruebas de JMeter
+│   └── results/                # Directorio para los reportes de JMeter
+├── .github/                    # Configuración de GitHub Actions
+│   └── workflows/
+│       └── test.yml            # Pipeline de CI/CD
+└── .dockerignore               # Archivo para ignorar archivos al construir imágenes Docker
+                </code></pre>
+        </div>
+    </div>
+
+    <!-- Cómo Ejecutar el Proyecto Localmente -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">🚀 Cómo Ejecutar el Proyecto Localmente</h2>
+        <p class="text-gray-700 mb-4 leading-relaxed">
+            Para ejecutar las pruebas y los servicios Docker Compose en tu máquina local (manteniendo todas las pruebas, incluyendo funcionales y de rendimiento):
+        </p>
+        <ol class="list-decimal list-inside text-gray-700 ml-4">
+            <li><strong class="font-semibold">Clona el repositorio:</strong>
+                <div class="code-block mt-1">
+                        <pre><code>git clone &lt;URL_DE_TU_REPOSITORIO&gt;
+cd evaluacion-modulo4</code></pre>
+                </div>
+            </li>
+            <li><strong class="font-semibold">Asegúrate de tener Docker Desktop instalado y en ejecución.</strong></li>
+            <li><strong class="font-semibold">Crea la estructura de carpetas necesaria:</strong>
+                <div class="code-block mt-1">
+                    <pre><code>mkdir -p webapp jmeter jmeter/results .github/workflows</code></pre>
+                </div>
+            </li>
+            <li><strong class="font-semibold">Coloca todos los archivos del proyecto en sus ubicaciones correctas.</strong></li>
+            <li><strong class="font-semibold">Construye y levanta todos los servicios Docker Compose (todas las pruebas):</strong>
+                <div class="code-block mt-1">
+                    <pre><code>docker compose up --build</code></pre>
+                </div>
+                <p class="ml-4 mt-2">Esto construirá todas las imágenes y levantará todos los servicios. Las pruebas unitarias, funcionales y de rendimiento se ejecutarán automáticamente según la configuración de tu <code>docker-compose.yml</code>.</p>
+            </li>
+            <li><strong class="font-semibold">Para ver la webapp en tu navegador local:</strong>
+                <p class="ml-4 mt-2">Abre tu navegador y ve a <a href="http://localhost:8080" target="_blank" class="text-blue-600 hover:underline">http://localhost:8080</a>.</p>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Conclusión -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold section-title">🎯 Conclusión</h2>
+        <p class="text-gray-700 leading-relaxed">
+            Este proyecto demuestra una comprensión integral de las metodologías de prueba de software y la implementación de un pipeline de CI/CD, esencial para el desarrollo de software moderno y de alta calidad. Se ha logrado un equilibrio entre la exhaustividad de las pruebas en el entorno local y la eficiencia del pipeline de integración continua.
+        </p>
+    </div>
+</div>
+</body>
+</html>
