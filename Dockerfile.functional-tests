@@ -1,0 +1,57 @@
+FROM openjdk:11-jdk-slim
+
+WORKDIR /app
+
+  # Install Maven, Curl, Wget, and all necessary dependencies for headless Chromium/Chromedriver execution
+  # Instalar Maven, Curl, Wget y todas las dependencias necesarias para la ejecución headless de Chromium/Chromedriver
+RUN apt-get update && apt-get install -y \
+maven \
+curl \
+wget \
+chromium \
+chromium-driver \
+  # Essential dependencies for headless Chromium
+  # Dependencias esenciales para Chromium headless
+libnss3 \
+libgconf-2-4 \
+libappindicator1 \
+libxcomposite1 \
+libxi6 \
+libatk-bridge2.0-0 \
+libgtk-3-0 \
+libasound2 \
+libatk1.0-0 \
+libcairo2 \
+libcups2 \
+libdbus-1-3 \
+libxrandr2 \
+libxrender1 \
+libxtst6 \
+xdg-utils \
+fonts-liberation \
+libfontconfig1 \
+libglib2.0-0 \
+libnspr4 \
+libxcb1 \
+libxss1 \
+--no-install-recommends && \
+rm -rf /var/lib/apt/lists/*
+
+  # Create a user for running tests and set ownership
+  # Crear un usuario para ejecutar pruebas y establecer la propiedad
+RUN useradd -m -s /bin/bash testuser && \
+chown -R testuser:testuser /app
+
+USER testuser
+
+  # Set environment variables for Chromium and Chromedriver paths
+  # Establecer variables de entorno para las rutas de Chromium y Chromedriver
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/lib/chromium-browser/chromedriver
+
+COPY --chown=testuser:testuser pom.xml .
+RUN mvn dependency:go-offline
+
+COPY --chown=testuser:testuser . .
+
+CMD ["mvn", "test", "-Dtest=HealthTrackFunctionalTest"]

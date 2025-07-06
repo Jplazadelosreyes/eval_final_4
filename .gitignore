@@ -1,0 +1,38 @@
+# Ignorar directorios de compilación y artefactos de Maven
+target/
+pom.xml.tag
+
+# Ignorar directorios de IDEs
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Ignorar dependencias de Maven descargadas localmente
+.m2/
+
+# Ignorar archivos de Docker y Compose que no deben ser versionados o son generados
+Dockerfile.functional-tests.bak # Si creaste un backup
+docker-compose.yml.bak # Si creaste un backup
+*.bak
+*.tmp
+
+# Ignorar logs y reportes de pruebas
+*.log
+*.jtl
+jmeter/results/
+
+# Ignorar archivos de sistema y temporales
+.DS_Store
+Thumbs.db
+*.swp
+*~
+~*
+
+# Ignorar datos sensibles o de configuración local
+.env
+.env.*
+*.properties # Si tienes archivos de propiedades con credenciales
+*.conf

@@ -1,0 +1,57 @@
+services:
+  unit-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: ["mvn", "test"]
+    networks:
+      - default
+
+  functional-tests:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.functional-tests
+    volumes:
+      - .:/app
+    command: ["mvn", "test", "-Dtest=HealthTrackFunctionalTest"]
+    depends_on:
+      webapp:
+        condition: service_healthy
+    networks:
+      - default
+
+  webapp:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./webapp:/usr/share/nginx/html:ro
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t && curl -f http://localhost/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  # Servicio para pruebas de rendimiento con JMeter
+  performance-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.jmeter
+    volumes:
+      # RUTAS EXPLÍCITAS CON LA VERSIÓN DE JMETER (5.6.3)
+      - ./jmeter/results:/app/jmeter/apache-jmeter-5.6.3/bin/html_report
+      - ./jmeter/test_results.jtl:/app/jmeter/apache-jmeter-5.6.3/bin/test_results.jtl
+    depends_on:
+      webapp:
+        condition: service_healthy
+    command: ["jmeter", "-n", "-t", "/app/jmeter/apache-jmeter-5.6.3/bin/healthtrack_performance_test.jmx", "-l", "test_results.jtl", "-e", "-o", "html_report"]
+    networks:
+      - default
+
+networks:
+  default:

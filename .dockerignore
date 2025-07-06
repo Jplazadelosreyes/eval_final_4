@@ -1,0 +1,11 @@
+.git
+.gitignore
+Dockerfile
+Dockerfile.functional-tests
+docker-compose.yml
+readme.md
+*.md
+target/
+.idea/
+.vscode/
+*.iml

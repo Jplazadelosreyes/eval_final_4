@@ -1,0 +1,22 @@
+FROM adoptopenjdk/openjdk11:latest
+
+WORKDIR /app/jmeter
+
+# Instalar wget y unzip para descargar JMeter
+RUN apt-get update && apt-get install -y wget unzip
+
+# Descargar e instalar JMeter
+ARG JMETER_VERSION=5.6.3
+RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.zip && \
+    unzip apache-jmeter-${JMETER_VERSION}.zip && \
+    rm apache-jmeter-${JMETER_VERSION}.zip
+
+# Establecer la variable de entorno PATH correctamente
+ENV JMETER_HOME=/app/jmeter/apache-jmeter-${JMETER_VERSION}
+ENV PATH="${JMETER_HOME}/bin:${PATH}"
+
+# Copiar el plan de pruebas JMeter al directorio bin de JMeter
+COPY jmeter/healthtrack_performance_test.jmx ${JMETER_HOME}/bin/
+
+# CMD por defecto para ejecutar JMeter (puede ser sobrescrito por docker-compose)
+CMD ["jmeter", "-n", "-t", "${JMETER_HOME}/bin/healthtrack_performance_test.jmx", "-l", "test_results.jtl", "-e", "-o", "html_report"]
