@@ -1,3 +1,5 @@
+[![CI/CD Pipeline - HealthTrack App](https://github.com/Jplazadelosreyes/eval_final_4/actions/workflows/test.yml/badge.svg)](https://github.com/Jplazadelosreyes/eval_final_4/actions/workflows/test.yml)
+
 # HealthTrack: Sistema de Gestión de Salud
 
 <div align="center">
