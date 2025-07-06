@@ -25,7 +25,8 @@ jobs:
 
       - name: Build and Run Unit Tests
         # Ejecuta el servicio 'unit-tests' definido en docker-compose.yml.
-        # El pom.xml ya está configurado para excluir HealthTrackFunctionalTest.java.
+        # El pom.xml ya está configurado para excluir HealthTrackFunctionalTest.java,
+        # por lo que solo se ejecutarán las pruebas unitarias.
         run: docker compose run --rm unit-tests
 
       - name: Build Webapp Image
