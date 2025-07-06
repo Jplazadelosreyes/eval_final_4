@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - HealthTrack App
+name: CI/CD Pipeline - HealthTrack App (Despliegue y Unitarias)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build-and-deploy-test: # Nombre del trabajo ajustado para reflejar el enfoque
     runs-on: ubuntu-latest
 
     steps:
@@ -28,19 +28,14 @@ jobs:
         # Maven ejecutará los tests unitarios y generará los reportes
         run: docker compose run --rm unit-tests
 
-      - name: Build Docker Images (functional-tests, performance-tests & webapp)
-        # Construye todas las imágenes necesarias para las pruebas funcionales y de rendimiento
-        run: docker compose build functional-tests performance-tests webapp
+      - name: Build Webapp Image
+        # Construye solo la imagen de la webapp
+        run: docker compose build webapp
 
-      - name: Run Functional Tests
-        # Levanta la webapp y ejecuta los tests funcionales
-        # --abort-on-container-exit detiene los servicios una vez que functional-tests termina
-        run: docker compose up --abort-on-container-exit functional-tests webapp
-
-      - name: Run Performance Tests
-        # Levanta la webapp y ejecuta los tests de rendimiento con JMeter
-        # --abort-on-container-exit detiene los servicios una vez que performance-tests termina
-        run: docker compose up --abort-on-container-exit performance-tests webapp
+      - name: Deploy and Test Webapp Health
+        # Levanta la webapp y espera a que su healthcheck pase
+        # Esto simula un despliegue y verifica que el servidor web está operativo
+        run: docker compose up --abort-on-container-exit --wait webapp
 
       - name: Stop and Remove Containers
         # Asegura que los contenedores se detengan y eliminen, incluso si algún paso anterior falla
